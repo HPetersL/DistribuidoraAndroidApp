@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Distribuidora_Semana5</string>
+        <string name="titulo_bienvenida">Bienvenido a distribuidora Pandas</string>
+        <string name="instruccion_google">Por favor ingrese con su cuenta de Google.</string>
+        <string name="cerrar_sesion">Cerrar Sesión</string>
+        <string name="seleccionar_productos">Selecciona tus productos</string>
+        <string name="Calculo_envio">Calcular Envío</string>
+        <string name="resultado_calculo">El costo total de su despacho es:</string>
+        <string name="boton_cero">0</string>
+        <string name="nombre_producto">Nombre Producto</string>
+
+
+        <string name="titulo_selecciona_productos">Selecciona tus productos</string>
+        <string name="calcular_costo">Calcular Costo</string>
+        <string name="resultado_placeholder">El desglose de tu compra aparecerá aquí.</string>
+        <string name="pagar">Pagar</string>
+
+        <string name="label_subtotal_productos">Subtotal Productos: %1$s</string>
+        <string name="label_valor_neto">Valor Neto: %1$s</string>
+        <string name="label_iva">IVA (19%%): %1$s</string>
+        <string name="label_costo_envio">Costo de Envío: %1$s</string>
+        <string name="label_total_pagar">TOTAL A PAGAR: %1$s</string>
+        <string name="placeholder_valor">$0</string>
+
+        <string name="producto_nombre_placeholder">Nombre Producto</string>
+        <string name="restar">-</string>
+        <string name="sumar">+</string>
+        <string name="cantidad_inicial">0</string>
+        <string name="mensaje_pago_simulado">Procesando pago... (Simulación)</string>
+        <string name="label_distancia">Distancia a la bodega: %.2f km</string>
+    
+    
+</resources>
