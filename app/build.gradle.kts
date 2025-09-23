@@ -1,4 +1,7 @@
 
+import java.util.Properties
+import java.io.FileInputStream
+
 /*plugins a utilizar: */
 plugins {
     /*plugin para aplicaciones android*/
@@ -26,6 +29,18 @@ android {
         versionName = "1.0"
         /*runner para pruebas*/
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Este bloque ahora funcionará porque ya importamos Properties y FileInputStream
+        val localProperties = Properties()
+        val localPropertiesFile = project.rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        buildConfigField("String", "MAPS_API_KEY", "\"${localProperties.getProperty("MAPS_API_KEY")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -38,16 +53,12 @@ android {
         }
     }
     compileOptions {
-        /*compatibilidad con java 8*/
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        /*define version de JVM para kotlin*/
         jvmTarget = "1.8"
     }
-    /*es buena practica segun Android usar ViewBindin para
-    * aumentar la seguridad UI evitando asi el uso de findViewById*/
     buildFeatures {
         viewBinding = true
     }
@@ -78,4 +89,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    /*dependencia de firestore*/
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.database)
+
+    /*dependencias de retrofit*/
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
 }

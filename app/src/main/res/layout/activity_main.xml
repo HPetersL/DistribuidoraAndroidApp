@@ -27,23 +27,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:contentPadding="16dp">
+            app:cardElevation="4dp">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_productos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:padding="16dp"
+                tools:listitem="@layout/item_producto"
+                tools:itemCount="5" />
 
-                <include layout="@layout/item_producto" android:id="@+id/item_harina" />
-                <include layout="@layout/item_producto" android:id="@+id/item_aceite" />
-                <include layout="@layout/item_producto" android:id="@+id/item_azucar" />
-                <include layout="@layout/item_producto" android:id="@+id/item_pastas" />
-                <include layout="@layout/item_producto" android:id="@+id/item_arroz" />
-                <include layout="@layout/item_producto" android:id="@+id/item_atun" />
-                <include layout="@layout/item_producto" android:id="@+id/item_snack" />
-
-            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <Button

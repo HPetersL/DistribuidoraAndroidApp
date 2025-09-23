@@ -28,6 +28,13 @@
         <string name="cantidad_inicial">0</string>
         <string name="mensaje_pago_simulado">Procesando pago... (Simulación)</string>
         <string name="label_distancia">Distancia a la bodega: %.2f km</string>
-    
+
+    <!--nuevos string fase dos-->
+    <string name="hint_email">Correo Electrónico</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="iniciar_sesion">Iniciar Sesión</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="registro_exitoso">Usuario registrado exitosamente.</string>
+    <string name="error_campos_vacios">Por favor, completa todos los campos.</string>
     
 </resources>

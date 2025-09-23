@@ -4,107 +4,125 @@ package com.example.midistribuidoraapp
 import android.content.Intent
 /*clase de obtencion y ciclo de vida de datos*/
 import android.os.Bundle
-/*clase para crear logs*/
-import android.util.Log
+/*clase para crear y manipular botones*/
+import android.widget.Button
+/*clase para campos de entrada de datos en pantalla*/
+import android.widget.EditText
 /*clase para mensajes a usuario*/
 import android.widget.Toast
 /*clase para compatibilidad con versiones antiguas de android*/
 import androidx.appcompat.app.AppCompatActivity
-/*API para gestion de credenciales*/
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-/*clase de kotlin para creacion y destruccion de corrutinas*/
-import androidx.lifecycle.lifecycleScope
-/*clases para boton de google Sign-In y login*/
-import com.google.android.gms.common.SignInButton
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-/*autenticacion por Firebase, valida token y administra sesiones*/
+/*autenticacion por Firebase y administrador de sesiones*/
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
 
 /*clase que define la actividad de Login, hereda de AppCompatActivity*/
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth/*instancia de firebase para autenticar*/
-    private lateinit var credentialManager: CredentialManager/*gestor de credenciales*/
-    private lateinit var signInButton: SignInButton/*boton de google para inicio de sesion*/
+    /*instancia de firebase para autenticar*/
+    private lateinit var auth: FirebaseAuth
+
+    /*instancias de botones y campos de entrada de texto*/
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var btnLogin: Button
+    private lateinit var btnRegister: Button
 
     /*metodo de carga del layout inicial*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        /*inicio de firebase Auth y credential manager*/
+        /*instancia de firebase auth*/
         auth = FirebaseAuth.getInstance()
-        credentialManager = CredentialManager.create(this)
-        /*boton de login y funcion sign in*/
-        signInButton = findViewById(R.id.sign_in_button)
-        signInButton.setOnClickListener {
-            lifecycleScope.launch {
-                signInWithGoogle()
-            }
+
+        /* referencia a la vistas del layout*/
+        etEmail = findViewById(R.id.et_email)
+        etPassword = findViewById(R.id.et_password)
+        btnLogin = findViewById(R.id.btn_login)
+        btnRegister = findViewById(R.id.btn_register)
+
+        /*listener para el boton login y registrar*/
+        btnLogin.setOnClickListener {
+            loginUser()
+        }
+
+        btnRegister.setOnClickListener {
+            registerUser()
         }
     }
+
     /*metodo para pasar a pagina de negocio si el usuario ya esta autenticado*/
     override fun onStart() {
         super.onStart()
-        if (auth.currentUser != null) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
             goToMainActivity()
         }
     }
-    /*funcion que inicia el flujo de autenticacion con google*/
-    private suspend fun signInWithGoogle() {
-            /*configuracion de login con google usando el client_id del archivo
-            * json obtenido en Firebase*/
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(getString(R.string.default_web_client_id))
-            .build()
-            /*creacion de solicitud de credenciales*/
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-        /*bloque try/catch para manejo de excepciones*/
-        /*llamada a credential manager para obtener la credencial del usuario*/
-        try {
-            val result = credentialManager.getCredential(this, request)
-            val credential = result.credential
-            /*verificacion de la credencial sea del tipo google token y extre
-            * el token para autenticar con firebase, si hay error lo registra y muestra*/
-            if (credential is GoogleIdTokenCredential) {
-                val googleIdToken = credential.idToken
-                firebaseAuthWithGoogle(googleIdToken)
-            } else {
-                Log.e("LoginActivity", "Error: La credencial no es del tipo esperado.")
-                Toast.makeText(this, "Error de inicio de sesión.", Toast.LENGTH_SHORT).show()
-            }
 
-        } catch (e: Exception) {
-            Log.e("LoginActivity", "Falló el inicio de sesión con Google", e)
-            Toast.makeText(this, "Falló el inicio de sesión con Google.", Toast.LENGTH_SHORT).show()
+    /*obtencion del texto ingresados en los campos del layout
+    * toma el string ingresado en email y contraseña*/
+    private fun registerUser() {
+        val email = etEmail.text.toString().trim()
+        val password = etPassword.text.toString().trim()
+
+        /*manoje de excepciones, verifica que los campos no esten vacios*/
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, getString(R.string.error_campos_vacios), Toast.LENGTH_SHORT).show()
+            return
         }
-    }
 
-    /*se usa el token extraido de google para crear la credencial de firebase
-    * si la autenticacion es exitosa redirige al usuario a la pagina de negocio
-    * si falla muestra una mensaje de fallo*/
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
+        /*metodo para crear la cuenta en firebase con los datos ingresados*/
+        auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Autenticación exitosa.", Toast.LENGTH_SHORT).show()
-                    goToMainActivity()
+                    val user = auth.currentUser
+                    /*usamos la funcion de firebase para enviar correo de confimacion*/
+                    user?.sendEmailVerification()
+                        ?.addOnCompleteListener { verificationTask ->
+                            if (verificationTask.isSuccessful) {
+                                /*mensaje de exito*/
+                                Toast.makeText(baseContext, "Registro exitoso. Revisa tu correo para verificar tu cuenta.", Toast.LENGTH_LONG).show()
+                            } else {
+                                /*manejo de excepciones*/
+                                Toast.makeText(baseContext, "Registro exitoso, pero falló el envío del correo de verificación.", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    /*cerramos sesion asi el usuario debe entrar de forma manual con sus nuevas credenciales*/
+                    auth.signOut()
                 } else {
-                    Toast.makeText(this, "Falló la autenticación con Firebase.", Toast.LENGTH_SHORT).show()
+                    /*manejo de error si falla el registro*/
+                    Toast.makeText(baseContext, "Falló el registro: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
     }
 
-    /*funcion para ir directamnete a la vista principal y cerrar esta para manejo de memoria
-    * buenas practicas recomendadas para liberar memoria*/
+    /*metodos para obtener los datos de los campos para login*/
+    private fun loginUser() {
+        val email = etEmail.text.toString().trim()
+        val password = etPassword.text.toString().trim()
+
+        /*manejo de excepciones, verifica que los campos no esten vacios*/
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, getString(R.string.error_campos_vacios), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        /*metodo para iniciar sesion en firebase con las credenciales creadas*/
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    /*registro exitoso envia al usuario a la pantalla principal*/
+                    goToMainActivity()
+                } else {
+                    Toast.makeText(baseContext, "Falló la autenticación. Revisa tus credenciales.", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    /*metodo para pasar a pantalla principal y cerrar la interfaz de login
+    * para ahorrar memoria, esto impide que el usuario vuelva a la pantalla de login
+    * con el boton volver atras*/
     private fun goToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)

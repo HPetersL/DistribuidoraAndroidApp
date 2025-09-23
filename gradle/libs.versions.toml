@@ -11,8 +11,15 @@ activity = "1.10.1"
 constraintlayout = "2.2.1"
 googleGmsGoogleServices = "4.4.2"
 firebaseBom = "34.2.0"
+retrofit = "2.9.0"
 
 [libraries]
+#se añaden las librerias de retrofit
+retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+#se añade la libreria necearia para firestore
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
