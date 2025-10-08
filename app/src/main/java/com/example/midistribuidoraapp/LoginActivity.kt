@@ -27,6 +27,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var btnRegister: Button
 
+    /*nuevo boton para medir interfaz de temperatura*/
+    private lateinit var btnMonitorTemperatura: Button
+
     /*metodo de carga del layout inicial*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +43,8 @@ class LoginActivity : AppCompatActivity() {
         etPassword = findViewById(R.id.et_password)
         btnLogin = findViewById(R.id.btn_login)
         btnRegister = findViewById(R.id.btn_register)
+        btnMonitorTemperatura = findViewById(R.id.btn_monitor_temperatura)
+
 
         /*listener para el boton login y registrar*/
         btnLogin.setOnClickListener {
@@ -48,6 +53,10 @@ class LoginActivity : AppCompatActivity() {
 
         btnRegister.setOnClickListener {
             registerUser()
+        }
+        btnMonitorTemperatura.setOnClickListener {
+            val intent = Intent(this, TemperaturaActivity::class.java)
+            startActivity(intent)
         }
     }
 

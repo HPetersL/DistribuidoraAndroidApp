@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     android:padding="24dp"
     tools:context=".LoginActivity">
 
@@ -13,31 +12,31 @@
         android:id="@+id/logo_pandas"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/logofinal"
         android:layout_marginBottom="32dp"
-        android:contentDescription="@string/instruccion_google"/>
+        android:contentDescription="@string/instruccion_google"
+        android:src="@drawable/logofinal" />
 
     <EditText
         android:id="@+id/et_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:hint="@string/hint_email"
-        android:inputType="textEmailAddress"
-        android:layout_marginBottom="16dp"/>
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/et_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:hint="@string/hint_password"
-        android:inputType="textPassword"
-        android:layout_marginBottom="24dp"/>
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/iniciar_sesion"/>
+        android:text="@string/iniciar_sesion" />
 
     <Button
         android:id="@+id/btn_register"
@@ -45,6 +44,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/registrarse"/>
+        android:text="@string/registrarse" />
+
+    <Button
+        android:id="@+id/btn_monitor_temperatura"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/monitorear_temp" />
 
 </LinearLayout>

@@ -36,5 +36,12 @@
     <string name="registrarse">Registrarse</string>
     <string name="registro_exitoso">Usuario registrado exitosamente.</string>
     <string name="error_campos_vacios">Por favor, completa todos los campos.</string>
-    
+
+    <!--strings temperatura-->
+    <string name="temp_icono">Icono de temperatura</string>
+    <string name="monitorear_temp">Monitorear Temperatura</string>
+    <string name="congelador_temp">Temperatura del Congelador</string>
+    <string name="simbolos_temp">--.- °C</string>
+    <string name="alerta_titulo">Configurar Alerta (en °C)</string>
+    <string name="guardar_alerta">Guardar Límite de T°</string>
 </resources>
