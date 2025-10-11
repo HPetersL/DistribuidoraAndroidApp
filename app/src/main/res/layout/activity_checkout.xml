@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--usamos scrollview para permitir desplazamiento vertical-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF"
+    tools:context=".CheckoutActivity">
+
+    <!--contenedor principal, organiza cont vertical-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <!--titulo de contenedor compra-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resumen_compra"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <!--texto de distancia-->
+        <TextView
+            android:id="@+id/tv_distancia_checkout"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Distancia a la bodega: 3.29 km" />
+
+        <!--texto valor neto-->
+        <TextView
+            android:id="@+id/tv_valor_neto_checkout"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Valor Neto: $18.487" />
+
+        <!--texto IVA-->
+        <TextView
+            android:id="@+id/tv_iva_checkout"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="IVA (19%): $3.513" />
+
+        <!--texto subtotal-->
+        <TextView
+            android:id="@+id/tv_subtotal_productos_checkout"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="Subtotal Productos: $22.000" />
+
+        <!--texto costos de envio-->
+        <TextView
+            android:id="@+id/tv_costo_envio_checkout"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Costo de Envío: $988" />
+
+        <!--separador horizontal-->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="16dp"
+            android:background="#DDDDDD" />
+
+        <!--texto total final-->
+        <TextView
+            android:id="@+id/tv_total_pagar_checkout"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            tools:text="TOTAL A PAGAR: $22.988" />
+
+        <!--boton pagar-->
+        <Button
+            android:id="@+id/btn_pagar_final"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/pagar"/>
+
+        <!--titulo mapa-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ubicacion_y_ruta"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!--mapa google-->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+    </LinearLayout>
+</ScrollView>

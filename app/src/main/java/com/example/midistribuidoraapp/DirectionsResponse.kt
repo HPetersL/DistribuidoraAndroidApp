@@ -6,6 +6,12 @@ data class RoutesResponse(
     val routes: List<RouteLeg>
 )
 /*esta toma la routeleg que nos interesa y la expresa en metros*/
+/*FASE 3: agregamos el valor para la polilinea del nuevo mapa*/
 data class RouteLeg(
-    val distanceMeters: Int
+    val distanceMeters: Int,
+    val polyline: EncodedPolyline?
+)
+
+data class EncodedPolyline(
+    val encodedPolyline: String
 )

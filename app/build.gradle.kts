@@ -17,30 +17,27 @@ android {
     compileSdk = 36 /*version del SDK para compilar*/
 
     defaultConfig {
-        /*ID de la unico para uso en playstore*/
         applicationId = "com.example.midistribuidoraapp"
-        /*version minima de android soportada*/
         minSdk = 23
-        /*version objetivo para optimizacion*/
         targetSdk = 36
-        /*codigo interno 1° version*/
         versionCode = 1
-        /*nombre visible de la version*/
         versionName = "1.0"
-        /*runner para pruebas*/
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Este bloque ahora funcionará porque ya importamos Properties y FileInputStream
+        // Cargar API Key desde local.properties
         val localProperties = Properties()
-        val localPropertiesFile = project.rootProject.file("local.properties")
+        val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
             localProperties.load(FileInputStream(localPropertiesFile))
         }
-        buildConfigField("String", "MAPS_API_KEY", "\"${localProperties.getProperty("MAPS_API_KEY")}\"")
-    }
 
-    buildFeatures {
-        buildConfig = true
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
+        // Inyectar en el Manifest
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
+        // Opcional: También como BuildConfig si lo necesitas en código
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
     buildTypes {
@@ -61,6 +58,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -97,4 +95,8 @@ dependencies {
     /*dependencias de retrofit*/
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
+
+    /*dependencias de maps*/
+    implementation(libs.play.services.maps)
+    implementation(libs.android.maps.utils)
 }

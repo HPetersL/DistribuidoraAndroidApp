@@ -1,14 +1,12 @@
 package com.example.midistribuidoraapp
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -23,8 +21,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
-import java.util.Locale
 
 
 /*se define la clase de dato para cada campo de los productos*/
@@ -39,18 +35,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var dbRealtime: DatabaseReference
     private lateinit var dbFirestore: FirebaseFirestore
+
     /*referencias para elementos visuales de activity main*/
-    private lateinit var layoutResultados: LinearLayout
-    private lateinit var tvDistancia: TextView
-    private lateinit var tvValorNeto: TextView
-    private lateinit var tvIva: TextView
-    private lateinit var tvSubtotalProductos: TextView
-    private lateinit var tvCostoEnvio: TextView
-    private lateinit var tvTotalPagar: TextView
     private lateinit var btnCalcularCosto: Button
-    private lateinit var btnPagar: Button
     private lateinit var btnCerrarSesion: Button
     private lateinit var recyclerView: RecyclerView
+
     private var productos: List<Producto> = listOf()
     /*aqui se alamecenan las cantidades seleccionadas para cada producto de la lista*/
     private val cantidades = mutableMapOf<String, Int>()
@@ -68,15 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         /*aqui se relaciona cada vista con su id del layout
         * se usa finViewById como recomendacion de Android*/
-        layoutResultados = findViewById(R.id.layout_resultados)
-        tvDistancia = findViewById(R.id.tv_distancia)
-        tvValorNeto = findViewById(R.id.tv_valor_neto)
-        tvIva = findViewById(R.id.tv_iva)
-        tvSubtotalProductos = findViewById(R.id.tv_subtotal_productos)
-        tvCostoEnvio = findViewById(R.id.tv_costo_envio)
-        tvTotalPagar = findViewById(R.id.tv_total_pagar)
         btnCalcularCosto = findViewById(R.id.btn_calcular_costo)
-        btnPagar = findViewById(R.id.btn_pagar)
         btnCerrarSesion = findViewById(R.id.btn_cerrar_sesion)
         recyclerView = findViewById(R.id.rv_productos)
 
@@ -89,19 +71,13 @@ class MainActivity : AppCompatActivity() {
         btnCalcularCosto.setOnClickListener {
             val subtotal = calcularSubtotal()
             if (subtotal > 0) {
-                layoutResultados.visibility = View.GONE
-                btnPagar.visibility = View.GONE
                 // Se lanza una coroutine para la llamada de red
                 lifecycleScope.launch {
-                    solicitarUbicacionYCalcularRuta(subtotal)
+                    solicitarUbicacionYCalcularRuta(subtotal, this@MainActivity)
                 }
             } else {
                 Toast.makeText(this, "Agrega al menos un producto.", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        btnPagar.setOnClickListener {
-            Toast.makeText(this, getString(R.string.mensaje_pago_simulado), Toast.LENGTH_LONG).show()
         }
 
         /*se agrego este boton por si el usuario desea cambiar de cuenta*/
@@ -134,7 +110,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al cargar productos: ${exception.message}", Toast.LENGTH_LONG).show()
             }
     }
-
 
     private fun guardarUbicacionDelUsuario() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -174,20 +149,12 @@ class MainActivity : AppCompatActivity() {
         return total
     }
 
-    /*da el formato a los valores numericos en la moneda local, en este caso
-    * se usa la region CL*/
-    private fun formatCurrency(value: Double): String {
-        val chileLocale = Locale.Builder().setLanguage("es").setRegion("CL").build()
-        val format = NumberFormat.getCurrencyInstance(chileLocale)
-        format.maximumFractionDigits = 0
-        return format.format(value)
-    }
-
     /*permisos y ubicacion para calcular costos de envio*/
     /*se verifica si hay permiso de ubicacion activo y si no, se solicitan
     * los permisos de ubicacion FINE_LOCATION, si no se conceden se detiene
     * la ejecucion "return"*/
-    private fun solicitarUbicacionYCalcularRuta(subtotalProductos: Double) {
+    // CAMBIO: La función ahora recibe el Context para poder iniciar la nueva actividad
+    private fun solicitarUbicacionYCalcularRuta(subtotalProductos: Double, context: Context) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
             return
@@ -219,21 +186,31 @@ class MainActivity : AppCompatActivity() {
 
                             /*verifica que exista al menos una ruta y devuelve la distancia en km*/
                             if (result.routes.isNotEmpty()) {
-                                val distanciaEnMetros = result.routes[0].distanceMeters
+                                val route = result.routes[0]
+                                val distanciaEnMetros = route.distanceMeters
                                 val distanciaEnKm = distanciaEnMetros / 1000.0
+                                val encodedPolyline = route.polyline?.encodedPolyline
 
-                                /*calculamos el costo del envio
-                                * descomponemos el subtotal en valor neto e IVA
-                                * calculamos el costo total con envio incluido*/
                                 val costoEnvio = calcularCostoDespachoLocal(subtotalProductos, distanciaEnKm)
                                 val valorNeto = subtotalProductos / (1 + IVA_RATE)
                                 val iva = subtotalProductos - valorNeto
                                 val totalPagar = subtotalProductos + costoEnvio
 
-                                /*actualizamos la interfaz con los datos obtenidos antes*/
-                                actualizarResultadosUI(distanciaEnKm, valorNeto, iva, subtotalProductos, costoEnvio, totalPagar)
-                                /*el buen manejo de errores, largo pero atrapa hasta el aire*/
-                            } else {
+                                /*creacion del intent para nueva interfaz*/
+                                val intent = Intent(context, CheckoutActivity::class.java).apply {
+                                    putExtra("distancia", distanciaEnKm)
+                                    putExtra("neto", valorNeto)
+                                    putExtra("iva", iva)
+                                    putExtra("subtotal", subtotalProductos)
+                                    putExtra("envio", costoEnvio)
+                                    putExtra("total", totalPagar)
+                                    putExtra("encodedPolyline", encodedPolyline)
+                                    putExtra("userLat", location.latitude)
+                                    putExtra("userLng", location.longitude)
+                                }
+                                startActivity(intent)
+
+                            }  else {
                                 Toast.makeText(this@MainActivity, "No se encontraron rutas (Routes API).", Toast.LENGTH_LONG).show()
                             }
                         } catch (e: Exception) {
@@ -245,22 +222,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity, "No se pudo obtener la ubicación. Inténtalo de nuevo.", Toast.LENGTH_LONG).show()
                 }
             }
-    }
-
-    private fun actualizarResultadosUI(distancia: Double, neto: Double, iva: Double, subtotal: Double, envio: Double, total: Double) {
-        /*muestra los valores de los textview correspondientes y usa formatCurrency para
-        * mostrar los valores en moneda chilena*/
-        tvDistancia.text = getString(R.string.label_distancia, distancia)
-        tvValorNeto.text = getString(R.string.label_valor_neto, formatCurrency(neto))
-        tvIva.text = getString(R.string.label_iva, formatCurrency(iva))
-        tvSubtotalProductos.text = getString(R.string.label_subtotal_productos, formatCurrency(subtotal))
-        tvCostoEnvio.text = getString(R.string.label_costo_envio, formatCurrency(envio))
-        tvTotalPagar.text = getString(R.string.label_total_pagar, formatCurrency(total))
-
-        /*muestra el bloque con los resultados y el boton pagar solo cuando
-        * el usuario llega de manera conforme a este paso*/
-        layoutResultados.visibility = View.VISIBLE
-        btnPagar.visibility = View.VISIBLE
     }
 
     private fun calcularCostoDespachoLocal(totalCompra: Double, distanciaEnKm: Double): Double {
@@ -282,8 +243,7 @@ class MainActivity : AppCompatActivity() {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 val subtotal = calcularSubtotal()
                 if (subtotal > 0) {
-                    // No es necesario lanzar una coroutine aquí directamente
-                    solicitarUbicacionYCalcularRuta(subtotal)
+                    solicitarUbicacionYCalcularRuta(subtotal, this)
                 }
             } else { /*manejo de excepcion por no concesion de permiso de ubicacion*/
                 Toast.makeText(this, "El permiso de ubicación es necesario para calcular el envío.", Toast.LENGTH_SHORT).show()

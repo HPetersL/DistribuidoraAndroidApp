@@ -12,6 +12,9 @@ constraintlayout = "2.2.1"
 googleGmsGoogleServices = "4.4.2"
 firebaseBom = "34.2.0"
 retrofit = "2.9.0"
+#añadimos las versiones de maps
+playServicesMaps = "18.2.0"
+androidMapsUtils = "3.8.0"
 
 [libraries]
 #se añaden las librerias de retrofit
@@ -30,7 +33,9 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-
+#librerias de maps necesarias
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+android-maps-utils = { group = "com.google.maps.android", name = "android-maps-utils", version.ref = "androidMapsUtils" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

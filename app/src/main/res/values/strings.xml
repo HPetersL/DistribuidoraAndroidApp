@@ -14,6 +14,7 @@
         <string name="calcular_costo">Calcular Costo</string>
         <string name="resultado_placeholder">El desglose de tu compra aparecerá aquí.</string>
         <string name="pagar">Pagar</string>
+        <string name="resumen_compra">Resumen de tu compra</string>
 
         <string name="label_subtotal_productos">Subtotal Productos: %1$s</string>
         <string name="label_valor_neto">Valor Neto: %1$s</string>
@@ -44,4 +45,7 @@
     <string name="simbolos_temp">--.- °C</string>
     <string name="alerta_titulo">Configurar Alerta (en °C)</string>
     <string name="guardar_alerta">Guardar Límite de T°</string>
+
+    <!--string fase tres ubicacion-->
+    <string name="ubicacion_y_ruta">Tu ubicación y ruta de entrega</string>
 </resources>

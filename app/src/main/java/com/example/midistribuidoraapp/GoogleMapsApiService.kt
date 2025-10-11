@@ -11,12 +11,11 @@ import retrofit2.http.POST
 
 /*en esta clase definimos el cuerpo de la peticion
 * POST donde incluimos las coordenadas de origen y
-* destino, el modo de transporte y como se calcula la ruta
-* en este caso con advertencias de trafico*/
+* destino, el modo de transporte*/
 data class RouteRequest(
     val origin: Waypoint,
     val destination: Waypoint,
-    val travelMode: String = "DRIVE",
+    val travelMode: String = "DRIVE"
 )
 data class Waypoint(
     val location: Location
@@ -33,15 +32,16 @@ data class LatLng(
     val longitude: Double
 )
 
-/*esto defino como se hace la solicitud POST */
+/*esto define como se hace la solicitud POST */
 interface GoogleMapsApiService {
     @Headers("Content-Type: application/json") /*el cuerpo debe ser json*/
     @POST("directions/v2:computeRoutes")
     suspend fun computeRoutes(
         @Header("X-Goog-Api-Key") apiKey: String, /*mi key de api de google cloud*/
-        /*esto especifica que campos se solicitan en la respuesta, simplifica la peticion
-        * mejora la eficiencia y reduce la carga ante muchas peticiones*/
-        @Header("X-Goog-FieldMask") fieldMask: String = "routes.distanceMeters",
+
+        /* FASE 4: Ahora pedimos la distancia Y la polilínea */
+        @Header("X-Goog-FieldMask") fieldMask: String = "routes.distanceMeters,routes.polyline.encodedPolyline",
+
         @Body requestBody: RouteRequest /*envia el objeto como json*/
     ): RoutesResponse /*espera una respuesta*/
 }

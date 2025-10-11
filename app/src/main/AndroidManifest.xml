@@ -18,6 +18,10 @@
         android:theme="@style/Theme.Distribuidora_Semana5"
         tools:targetApi="31">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -31,6 +35,8 @@
             android:name=".MainActivity" />
         <activity
             android:name=".TemperaturaActivity"/>
+        <!--agregamos la nueva pantalla-->
+        <activity android:name=".CheckoutActivity" />
 
 
     </application>
